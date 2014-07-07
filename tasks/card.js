@@ -60,6 +60,7 @@ module.exports = function(grunt) {
 		gitpull: {
 			dev: {
 				options: {
+					branch: 'dev'
 				}
 			}
 		},
