@@ -73,6 +73,8 @@ module.exports = function(grunt, exec) {
 			}
 		},
 		gitmerge: {
+			noted: {
+			 }
 		},
 		prompt: {
 			startCard: {
@@ -112,7 +114,7 @@ module.exports = function(grunt, exec) {
 		, 'gitpull:dev' // pull dev
 		, 'branch:review' // merge in the random branch
 		, 'gitcheckout:branch'
-		, 'gitmerge'
+		, 'gitmerge:noted'
 	]);
 
 	grunt.registerTask('card:describe', 'create file in repo to describe the current branch', function(){
@@ -139,7 +141,7 @@ module.exports = function(grunt, exec) {
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
 				grunt.config.set('branchInfo', branch);;
-				grunt.config.set('gitmerge.options.branch', makeBranchName(branch.type, branch.title));
+				grunt.config.set('gitmerge.noted.options.branch', makeBranchName(branch.type, branch.title));
 				break;
 			case 'review':
 				branch = grunt.config('branchInfo');;
