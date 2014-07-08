@@ -106,8 +106,8 @@ module.exports = function(grunt, exec) {
 		, 'gitcommit:describe' // commit description to new branch
 	]);
 
-	grunt.registerTask('card:submit', 'submit what you are working on for review', [
-		'branch:note'
+	grunt.registerTask('card:submit', 'submit what you are working on for review',
+		[ 'branch:note'
 		, 'gitcheckout:dev' // check out dev
 		, 'gitpull:dev' // pull dev
 		, 'branch:review' // merge in the random branch
@@ -134,13 +134,12 @@ module.exports = function(grunt, exec) {
 	});
 
 	grunt.registerTask('branch', 'create and merge random branches to and from dev', function(merge){
-		var branch;
+		var branch = grunt.file.readJSON('./etc/branch_description.json');;
 		switch(merge){
 			case 'note':
-				branch = grunt.file.readJSON('./etc/branch_description.json');
-				grunt.config.set('gitmerge.branch.options.branch', makeBranchName(branch.type, branch.title));
+				grunt.config.set('gitmerge.options.branch', makeBranchName(branch.type, branch.title));
 			case 'review':
-				grunt.config.set('gitmerge.branch.options.branch', makeBranchName('review', branch.title, branch.type));
+				grunt.config.set('gitcheckout.branch.options.branch', makeBranchName('review', branch.title, branch.type));
 				break;
 			default:
 				break;
