@@ -88,7 +88,10 @@ module.exports = function(grunt, exec) {
 						{
 							config: 'gitcheckout.branch.options.branch',
 							type: 'list',
-							message: "Which branch would you like to review?"
+							message: "Which branch would you like to review?",
+							choices: function(answers){
+								return grunt.config('prompt.whichCard.options.branches');
+							}
 						}
 					]
 				}
@@ -138,11 +141,34 @@ module.exports = function(grunt, exec) {
 	);
 
 	grunt.registerTask('card:review', 'choose a card to review',
-		[ 'card:findReviewable'
+		[ 'gitcheckout:dev' 
+		, 'card:findReviewable'
 		, 'prompt:whichCard'
 		, 'gitcheckout:branch'
 		]
 	);
+
+	grunt.registerTask('card:findReviewable', 'find cards that are ready for review', function(){
+		grunt.config.set('gitcheckout.branch.options.create', false);
+		var done = this.async();
+		grunt.util.spawn(
+			{ cmd: 'git'
+			, args: [ 'branch']
+			}
+			, function(err, result, code){
+				var endRay = [];
+				result = result.stdout.split("\n");
+				result.forEach(function(item, k, ray){
+					if(item.match(/^\s*review_/)){
+						endRay.push({name: item.trim()});
+					}
+				});
+				grunt.config.set('prompt.whichCard.options.branches', endRay);
+				done();
+			}
+		)
+	});
+
 
 	grunt.registerTask('card:start', 'perform git operations to begin a new card', function(){
 		// start and check out a new branch whose name is based on user's answer
@@ -162,25 +188,6 @@ module.exports = function(grunt, exec) {
 		grunt.file.write('./etc/branch_description.json', JSON.stringify(branchDescription , null, "\t"))
 	});
 
-	grunt.registerTask('card:findReviewable', 'find branches that are ready to be reviewed', function(){
-		grunt.util.spawn(
-			{ cmd: 'git'
-			, args: [ 'branch']
-			}
-			, function(err, result, code){
-				var endRay = [];
-				result = result.stdout.split("\n");
-				result.forEach(function(item, k, ray){
-					if(item.match(/^review_/)){
-						endRay.push(item);
-					}
-				});
-
-				grunt.config.set('prompt.whichCard.choices', endRay);
-			}
-		)
-				
-	});
 
 	grunt.registerTask('branch', 'create and merge random branches to and from dev', function(merge){
 		var branch, name
@@ -219,7 +226,7 @@ module.exports = function(grunt, exec) {
 		//
 		// if errors, tell user to correct conflicts and submit again
 
-	grunt.registerTask('card:review', 'review a branch for submission', function() {
+	//grunt.registerTask('card:review', 'review a branch for submission', function() {
 		// user selects branch to review from list of available branches
 		//
 		// checkout selected branch
@@ -237,7 +244,7 @@ module.exports = function(grunt, exec) {
 		// if no errors, tell user to have at it
 		//  
 		// if errors, tell user to either correct conflicts or reject
-	});
+	//});
 
 	grunt.registerTask('card:reject', 'send a branch back for more work', function() {
 		// move review branch to holding branch for corrections
