@@ -88,7 +88,7 @@ module.exports = function(grunt, exec) {
 					]
 				}
 			}
-			startCard: {
+			, startCard: {
 				options: {
 					questions: [
 						{
@@ -135,7 +135,7 @@ module.exports = function(grunt, exec) {
 		, 'prompt:whichCard'
 		, 'gitcheckout:branch'
 		]
-	});
+	);
 
 	grunt.registerTask('card:start', 'perform git operations to begin a new card', function(){
 		// start and check out a new branch whose name is based on user's answer
@@ -165,7 +165,7 @@ module.exports = function(grunt, exec) {
 				result = result.stdout.split("\n");
 				result.forEach(function(item, k, ray){
 					if(item.match(/^review_/)){
-						endRay[] = item;
+						endRay.push(item);
 					}
 				});
 
