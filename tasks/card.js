@@ -183,16 +183,18 @@ module.exports = function(grunt, exec) {
 	});
 
 	grunt.registerTask('branch', 'create and merge random branches to and from dev', function(merge){
-		var branch
+		var branch, name
 		switch(merge){
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
-				grunt.config.set('branchInfo', branch);;
+				grunt.config.set('branchInfo', branch);
 				grunt.config.set('gitmerge.noted.options.branch', makeBranchName(branch.type, branch.title));
 				break;
 			case 'review':
-				branch = grunt.config('branchInfo');;
-				grunt.config.set('gitcheckout.branch.options.branch', makeBranchName('review', branch.title, branch.type));
+				branch = grunt.config('branchInfo');
+				name   = makeBranchName('review', branch.title, branch.type);
+				grunt.config.set('gitcheckout.branch.options.branch', name);
+				grunt.config.set('gitpush.origin.options.branch', name);
 				break;
 			default:
 				break;
