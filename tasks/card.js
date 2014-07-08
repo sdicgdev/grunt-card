@@ -77,6 +77,17 @@ module.exports = function(grunt, exec) {
 			 }
 		},
 		prompt: {
+			whichCard: {
+				options: {
+					questions: [
+						{
+							config: 'gitcheckout.branch.options.branch',
+							type: 'list',
+							message: "Which branch would you like to review?"
+						}
+					]
+				}
+			}
 			startCard: {
 				options: {
 					questions: [
@@ -98,15 +109,16 @@ module.exports = function(grunt, exec) {
 		}
 	});
 
-	grunt.registerTask('card', 'start a new card', [
-		'prompt:startCard'     // ask what the user is working on
+	grunt.registerTask('card', 'start a new card', 
+		[ 'prompt:startCard'     // ask what the user is working on
 		, 'gitcheckout:dev'    // check out dev
 		, 'gitpull:dev'        // pull dev
 		, 'card:start'         // perform git operations to begin a new card
 		, 'gitcheckout:branch' // check out the branch
 		, 'card:describe'      // create file in repo to describe the current branch
 		, 'gitcommit:describe' // commit description to new branch
-	]);
+		]
+	);
 
 	grunt.registerTask('card:submit', 'submit what you are working on for review',
 		[ 'branch:note'
@@ -115,7 +127,24 @@ module.exports = function(grunt, exec) {
 		, 'branch:review' // merge in the random branch
 		, 'gitcheckout:branch'
 		, 'gitmerge:noted'
-	]);
+		]
+	);
+
+	grunt.registerTask('card:review', 'choose a card to review',
+		[ 'card:findReviewable'
+		, 'prompt:whichCard'
+		, 'gitcheckout:branch'
+		]
+	});
+
+	grunt.registerTask('card:start', 'perform git operations to begin a new card', function(){
+		// start and check out a new branch whose name is based on user's answer
+		var branchTitle = grunt.config('cardDescription')
+		    , branchType  = grunt.config('cardType');
+
+		// set the branch title
+		grunt.config.set('gitcheckout.branch.options.branch', makeBranchName(branchType, branchTitle));
+	});
 
 	grunt.registerTask('card:describe', 'create file in repo to describe the current branch', function(){
 		var branchDescription = 
@@ -126,13 +155,24 @@ module.exports = function(grunt, exec) {
 		grunt.file.write('./etc/branch_description.json', JSON.stringify(branchDescription , null, "\t"))
 	});
 
-	grunt.registerTask('card:start', 'perform git operations to begin a new card', function(){
-		// start and check out a new branch whose name is based on user's answer
-		var branchTitle = grunt.config('cardDescription')
-		    , branchType  = grunt.config('cardType');
+	grunt.registerTask('card:findReviewable', 'find branches that are ready to be reviewed', function(){
+		grunt.util.spawn(
+			{ cmd: 'git'
+			, args: [ 'branch']
+			}
+			, function(err, result, code){
+				var endRay = [];
+				result = result.stdout.split("\n");
+				result.forEach(function(item, k, ray){
+					if(item.match(/^review_/)){
+						endRay[] = item;
+					}
+				});
 
-		// set the branch title
-		grunt.config.set('gitcheckout.branch.options.branch', makeBranchName(branchType, branchTitle));
+				grunt.config.set('prompt.whichCard.choices', endRay);
+			}
+		)
+				
 	});
 
 	grunt.registerTask('branch', 'create and merge random branches to and from dev', function(merge){
