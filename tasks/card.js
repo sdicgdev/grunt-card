@@ -28,6 +28,11 @@ module.exports = function(grunt, exec) {
 				options:{
 					tags: true
 				}
+			},
+			origin:{
+				options:{
+					upstream: true
+				}
 			}
 		},
 		gitcommit: {
@@ -127,6 +132,8 @@ module.exports = function(grunt, exec) {
 		, 'branch:review' // merge in the random branch
 		, 'gitcheckout:branch'
 		, 'gitmerge:noted'
+		, 'gitpush:origin'
+		, 'gitcheckout:dev' // check out dev
 		]
 	);
 
