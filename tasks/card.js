@@ -130,7 +130,7 @@ module.exports = function(grunt, exec) {
 		    , branchType  = grunt.config('cardType');
 
 		// set the branch title
-		grunt.config.set('gitcheckout.branch.options.branch', makeBranchName(branchType, branchTitle);
+		grunt.config.set('gitcheckout.branch.options.branch', makeBranchName(branchType, branchTitle));
 	});
 
 	grunt.registerTask('branch', 'create and merge random branches to and from dev', function(merge){
