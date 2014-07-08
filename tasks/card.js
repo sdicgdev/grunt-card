@@ -130,7 +130,7 @@ module.exports = function(grunt, exec) {
 		    , branchType  = grunt.config('cardType');
 
 		// set the branch title
-		grunt.config.set('gitcheckout.branch.options.branch', makeBranchName(branchType, branchTitle);
+		grunt.config.set('gitcheckout.branch.options.branch', makeBranchName(branchType, branchTitle));
 	});
 
 	grunt.registerTask('branch', 'create and merge random branches to and from dev', function(merge){
@@ -138,7 +138,7 @@ module.exports = function(grunt, exec) {
 		switch(merge){
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');
-				grunt.config.set('gitmerge.branch.options.branch', makeBranchName(branch.type, branch.title);
+				grunt.config.set('gitmerge.branch.options.branch', makeBranchName(branch.type, branch.title));
 			case 'review':
 				grunt.config.set('gitmerge.branch.options.branch', makeBranchName('review', branch.title, branch.type));
 				break;
