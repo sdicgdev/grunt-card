@@ -119,7 +119,7 @@ module.exports = function(grunt, exec) {
 			options: {
 				updateConfigs: [],
 				commit: true,
-				commitFiles: ['-a'], 
+				commitFiles: ['.'], 
 				createTag: true,
 				tagName: '%VERSION%', 
 				tagMessage: 'Release %VERSION%', // updated by approval process
