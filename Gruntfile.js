@@ -31,8 +31,7 @@ module.exports = function(grunt) {
     // Configuration to be run (and then tested).
     card: {
 			options: {
-				name: "evan",
-				email: "evan@sdicg.com"
+				bump: ['package.json'],
 			}	
 		},
 

@@ -115,6 +115,19 @@ module.exports = function(grunt, exec) {
 				}
 			},
 		}
+		, bump: {
+			options: {
+				updateConfigs: [],
+				commit: true,
+				commitFiles: ['-a'], 
+				createTag: true,
+				tagName: '%VERSION%', 
+				tagMessage: 'Release %VERSION%', // updated by approval process
+				push: true,
+				pushTo: 'upstream',
+				gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'
+			}
+		},
 	});
 
 	grunt.registerTask('card', 'start a new card', 
@@ -142,13 +155,54 @@ module.exports = function(grunt, exec) {
 
 	grunt.registerTask('card:review', 'choose a card to review',
 		[ 'gitcheckout:dev' 
-		, 'card:findReviewable'
+		, 'card:find:review'
 		, 'prompt:whichCard'
 		, 'gitcheckout:branch'
 		]
 	);
 
-	grunt.registerTask('card:findReviewable', 'find cards that are ready for review', function(){
+	grunt.registerTask('card:reject', 'send a branch back for more work', 
+		[ 'card:move:fix'
+		, 'gitpush:origin'
+		, 'card:remove:review'
+		]
+	);
+
+	grunt.registerTask('card:approve', 'send a branch back for more work',
+		[ 'branch:note'
+		, 'gitcheckout:dev' // check out dev
+		, 'gitpull:dev' // pull dev
+		, 'branch:approve' 
+		, 'gitmerge:noted'
+		, 'bump'
+		, 'gitpush:release'
+		// check that on review branch
+		//
+		// pull
+		//
+		// checkout dev
+		// 
+		// pull
+		//
+		// make approval branch
+		//
+		// merge in review branch
+		//
+		// if no errors
+		//  - co dev and merge in approval branch
+		//  - tag branch
+		//  - delete approval branch
+		//  - delete review branch
+		//
+		// if errors
+		//  - tell user about errors
+		//  - allow them to fix and re-approve
+		//  - allow them to reject
+		// 
+		]
+	);
+
+	grunt.registerTask('card:find', 'find cards that are ready for review', function(tag){
 		grunt.config.set('gitcheckout.branch.options.create', false);
 		var done = this.async();
 		grunt.util.spawn(
@@ -156,10 +210,11 @@ module.exports = function(grunt, exec) {
 			, args: [ 'branch']
 			}
 			, function(err, result, code){
-				var endRay = [];
+				var  regx = new RegExp("^\\s*"+tag+"_")
+				   , endRay = [];
 				result = result.stdout.split("\n");
 				result.forEach(function(item, k, ray){
-					if(item.match(/^\s*review_/)){
+					if(item.match(regx)){
 						endRay.push({name: item.trim()});
 					}
 				});
@@ -179,6 +234,7 @@ module.exports = function(grunt, exec) {
 		grunt.config.set('gitcheckout.branch.options.branch', makeBranchName(branchType, branchTitle));
 	});
 
+
 	grunt.registerTask('card:describe', 'create file in repo to describe the current branch', function(){
 		var branchDescription = 
 		    	{ title: grunt.config('cardDescription')
@@ -192,6 +248,16 @@ module.exports = function(grunt, exec) {
 	grunt.registerTask('branch', 'create and merge random branches to and from dev', function(merge){
 		var branch, name
 		switch(merge){
+			case 'approve':
+
+				branch = grunt.file.readJSON('./etc/branch_description.json');;
+				name =  branch.title+" ("+branch.type+")";
+				// read options to determine which files should be bumped
+				grunt.config.set('bump.options.files', grunt.config.get('card.options.bump'));
+				grunt.config.set('bump.options.commitMessage', name);
+				grunt.config.set('bump.options.tagMessage',  name);
+
+				break;
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
 				grunt.config.set('branchInfo', branch);
@@ -245,38 +311,6 @@ module.exports = function(grunt, exec) {
 		//  
 		// if errors, tell user to either correct conflicts or reject
 	//});
-
-	grunt.registerTask('card:reject', 'send a branch back for more work', function() {
-		// move review branch to holding branch for corrections
-		//
-		// delete review branch
-	});
-
-	grunt.registerTask('card:approve', 'send a branch back for more work', function() {
-		// check that on review branch
-		//
-		// pull
-		//
-		// checkout dev
-		// 
-		// pull
-		//
-		// make approval branch
-		//
-		// merge in review branch
-		//
-		// if no errors
-		//  - co dev and merge in approval branch
-		//  - tag branch
-		//  - delete approval branch
-		//  - delete review branch
-		//
-		// if errors
-		//  - tell user about errors
-		//  - allow them to fix and re-approve
-		//  - allow them to reject
-		// 
-	});
 
 	grunt.registerTask('card:log', 'see history of approved cards', function(){
 		// show changelog of approved cards
