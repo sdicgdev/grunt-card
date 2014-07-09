@@ -170,9 +170,9 @@ module.exports = function(grunt, exec) {
 
 	grunt.registerTask('card:approve', 'send a branch back for more work',
 		[ 'branch:note'
+		, 'branch:approve' 
 		, 'gitcheckout:dev' // check out dev
 		, 'gitpull:dev' // pull dev
-		, 'branch:approve' 
 		, 'gitmerge:noted'
 		, 'bump'
 		, 'gitpush:release'
