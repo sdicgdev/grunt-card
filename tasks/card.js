@@ -171,6 +171,7 @@ module.exports = function(grunt, exec) {
 	grunt.registerTask('card:approve', 'send a branch back for more work',
 		[ 'branch:note'
 		, 'branch:approve' 
+		, 'gitcommit:describe' // commit description to new branch
 		, 'gitcheckout:dev' // check out dev
 		, 'gitpull:dev' // pull dev
 		, 'gitmerge:noted'
