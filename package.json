@@ -1,7 +1,7 @@
 {
   "name": "grunt-card",
   "description": "kanban in your terminal",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/sdicgdev/grunt-card",
   "author": {
     "name": "Evan Short",
