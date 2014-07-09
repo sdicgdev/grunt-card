@@ -249,8 +249,7 @@ module.exports = function(grunt, exec) {
 		var branch, name
 		switch(merge){
 			case 'approve':
-
-				branch = grunt.file.readJSON('./etc/branch_description.json');;
+				branch = grunt.config('branchInfo');
 				name =  branch.title+" ("+branch.type+")";
 				// read options to determine which files should be bumped
 				grunt.config.set('bump.options.files', grunt.config.get('card.options.bump'));
