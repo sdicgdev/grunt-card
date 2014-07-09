@@ -259,7 +259,7 @@ module.exports = function(grunt, exec) {
 				grunt.file.delete('./etc/branch_description.json');
 				grunt.util.spawn(
 					{ cmd: 'git'
-					, args: [ 'add', './etc/branch_description.json']
+					, args: [ 'add', './etc/branch_description.json', '-A']
 					}
 					, function(err, result, code){
 						done();
