@@ -256,6 +256,15 @@ module.exports = function(grunt, exec) {
 				grunt.config.set('bump.options.commitMessage', name);
 				grunt.config.set('bump.options.tagMessage',  name);
 				grunt.file.delete('./etc/branch_description.json');
+					var done = this.async();
+					grunt.util.spawn(
+						{ cmd: 'git'
+						, args: [ 'add', './etc/branch_description.json]
+						}
+						, function(err, result, code){
+							done();
+						}
+					);
 				break;
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
