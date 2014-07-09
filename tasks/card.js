@@ -124,7 +124,7 @@ module.exports = function(grunt, exec) {
 				tagName: '%VERSION%', 
 				tagMessage: 'Release %VERSION%', // updated by approval process
 				push: true,
-				pushTo: 'upstream',
+				pushTo: 'origin',
 				gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'
 			}
 		},
