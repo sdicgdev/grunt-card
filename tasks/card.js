@@ -247,24 +247,24 @@ module.exports = function(grunt, exec) {
 
 
 	grunt.registerTask('branch', 'create and merge random branches to and from dev', function(merge){
-		var branch, name
+		var branch, name, done
 		switch(merge){
 			case 'approve':
 				branch = grunt.config('branchInfo');
 				name =  branch.title+" ("+branch.type+")";
+				done = this.async();
 				// read options to determine which files should be bumped
 				grunt.config.set('bump.options.commitMessage', name);
 				grunt.config.set('bump.options.tagMessage',  name);
 				grunt.file.delete('./etc/branch_description.json');
-					var done = this.async();
-					grunt.util.spawn(
-						{ cmd: 'git'
-						, args: [ 'add', './etc/branch_description.json']
-						}
-						, function(err, result, code){
-							done();
-						}
-					);
+				grunt.util.spawn(
+					{ cmd: 'git'
+					, args: [ 'add', './etc/branch_description.json']
+					}
+					, function(err, result, code){
+						done();
+					}
+				);
 				break;
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
