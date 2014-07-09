@@ -254,6 +254,7 @@ module.exports = function(grunt, exec) {
 				// read options to determine which files should be bumped
 				grunt.config.set('bump.options.commitMessage', name);
 				grunt.config.set('bump.options.tagMessage',  name);
+				grunt.file.delete('./etc/branch_description.json');
 				break;
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
