@@ -17,73 +17,25 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 grunt.loadNpmTasks('grunt-card');
 ```
 
-## The "card" task
+## 'grunt card'
+Start a new card
 
-### Overview
-In your project's Gruntfile, add a section named `card` to the data object passed into `grunt.initConfig()`.
+You will be asked what you are working on and what sort of issue it is. The answers you give will be used to title the resulting branch, and the branches that will follow in the steps to come
 
-```js
-grunt.initConfig({
-  card: {
-    options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
-  },
-});
-```
+## 'grunt card:submit'
 
-### Options
+Once you have completed your task and committed the changes, running card:submit will take the steps necessary to generate a review branch
 
-#### options.separator
-Type: `String`
-Default value: `',  '`
+## 'grunt card:review'
 
-A string value that is used to do something with whatever.
+Get a list of cards available to review
 
-#### options.punctuation
-Type: `String`
-Default value: `'.'`
+## 'grunt card:approve'
 
-A string value that is used to do something else with whatever else.
+Merge the current branch into the dev branch and make a tag for it
 
-### Usage Examples
+## 'grunt card:log'
 
-#### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+Filterable list of the releases
 
-```js
-grunt.initConfig({
-  card: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
-
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
-
-```js
-grunt.initConfig({
-  card: {
-    options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
-
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
-
-## Release History
-_(Nothing yet)_
+    e.g. grunt card:log:0.1
