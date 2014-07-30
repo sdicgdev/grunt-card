@@ -7,6 +7,7 @@
  */
 
 'use strict';
+var _ = require('underscore');
 
 module.exports = function(grunt, exec) {
 	require('load-grunt-tasks')(grunt);
@@ -155,16 +156,10 @@ module.exports = function(grunt, exec) {
 
 	grunt.registerTask('card:review', 'choose a card to review',
 		[ 'gitcheckout:dev' 
-		, 'card:find:review'
-		, 'prompt:whichCard'
-		, 'gitcheckout:branch'
-		]
-	);
-
-	grunt.registerTask('card:reject', 'send a branch back for more work', 
-		[ 'card:move:fix'
-		, 'gitpush:origin'
-		, 'card:remove:review'
+		, 'gitpull:dev' 
+		, 'card:find:review' // find public branches with the prefix review_
+		, 'prompt:whichCard' // choose from those branches
+		, 'gitcheckout:branch' // check out review branch
 		]
 	);
 
@@ -177,29 +172,6 @@ module.exports = function(grunt, exec) {
 		, 'gitmerge:noted'
 		, 'bump'
 		, 'gitpush:release'
-		// check that on review branch
-		//
-		// pull
-		//
-		// checkout dev
-		// 
-		// pull
-		//
-		// make approval branch
-		//
-		// merge in review branch
-		//
-		// if no errors
-		//  - co dev and merge in approval branch
-		//  - tag branch
-		//  - delete approval branch
-		//  - delete review branch
-		//
-		// if errors
-		//  - tell user about errors
-		//  - allow them to fix and re-approve
-		//  - allow them to reject
-		// 
 		]
 	);
 
@@ -280,48 +252,65 @@ module.exports = function(grunt, exec) {
 		}
 	});
 
-		// pull
-		//
-		// check out dev
-		//
-		// pull
-		//
-		// if not on submit branch
-		//  - check out new review branch based on original branch's name
-		//  - merge branch user was on into new branch
-		//  - if no errors, push to origin
-		//
-		// if on submit branch
-		//  - pull
-		//  - commit with message "correcting conflicts" if there is anything to commit
-		//  - if no errors, push to origin
-		//
-		// if errors, tell user to correct conflicts and submit again
-
-	//grunt.registerTask('card:review', 'review a branch for submission', function() {
-		// user selects branch to review from list of available branches
-		//
-		// checkout selected branch
-		//
-		// pull
-		//
-		// checkout dev 
-		//
-		// pull
-		//
-		// create new review branch 
-		//
-		// merge selected branch 
-		//
-		// if no errors, tell user to have at it
-		//  
-		// if errors, tell user to either correct conflicts or reject
-	//});
-
-	grunt.registerTask('card:log', 'see history of approved cards', function(){
+	grunt.registerTask('card:log', 'see history of approved cards', function(vmatch){
 		// show changelog of approved cards
-	});
+		var item;
+		function compare(a, b) {
+			a = a.version;
+			b = b.version;
+			if (a === b) {
+				return 0;
+			}
 
+			var a_components = a.split(".");
+			var b_components = b.split(".");
+			var len = Math.min(a_components.length, b_components.length);
+
+			// loop while the components are equal
+			for (var i = 0; i < len; i++) {
+				// A bigger than B
+				if (parseInt(a_components[i]) > parseInt(b_components[i])) {
+					return 1;
+				}
+
+				// B bigger than A
+				if (parseInt(a_components[i]) < parseInt(b_components[i])) {
+					return -1;
+				}
+			}
+
+			// If one's a prefix of the other, the longer one is greater.
+			if (a_components.length > b_components.length) {
+				return 1;
+			}
+
+			if (a_components.length < b_components.length) {
+				return -1;
+			}
+
+			// Otherwise they are the same.
+			return 0;
+		}
+
+		var done = this.async()
+		grunt.util.spawn({cmd: "git", args: ["tag", "-l", "-n1"]}, function(err, result, code){
+			result = result.stdout.split("\n");
+			result = _.map(result, function(obj){
+				//obj.split("\t");
+				obj = obj.match(/(\d*\.\d*\.\d*\S*)\s(.*)/);
+				return {version: obj[1], description: obj[2].trim()}
+			});
+
+			result.sort(compare);
+
+			for(item in result){
+				if(!result[item]['version'].match(/\d*\.\d*\.\d*\S*-/) && (!vmatch || result[item]['version'].match('^'+vmatch))){;
+					console.log(result[item]['version']+"\t"+result[item]['description']);
+				}
+			}
+			done();
+		});
+	});
 };
 
 function camelCaseSentence(input){

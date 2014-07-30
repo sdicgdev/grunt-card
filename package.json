@@ -43,6 +43,7 @@
   "dependencies": {
     "grunt-git": "~0.2.14",
     "grunt-prompt": "~1.1.0",
-    "grunt-bump": "0.0.14"
+    "grunt-bump": "0.0.14",
+    "underscore": "~1.6.0"
   }
 }
