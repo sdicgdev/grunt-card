@@ -146,7 +146,6 @@ module.exports = function(grunt, exec) {
 
 	grunt.registerTask('card:submit', 'submit what you are working on for review',
 		[ 'branch:note'
-		, 'branch:removalPrep'
 		, 'gitcheckout:dev' // check out dev
 		, 'gitpull:dev' // pull dev
 		, 'branch:review' // merge in the random branch
@@ -154,7 +153,7 @@ module.exports = function(grunt, exec) {
 		, 'gitmerge:noted'
 		, 'gitpush:origin'
 		, 'gitcheckout:dev' // check out dev
-		, 'gitpush:remove'
+		, 'branch:remove'
 		]
 	);
 
@@ -245,7 +244,7 @@ module.exports = function(grunt, exec) {
 			case 'removalPrep':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
 				grunt.config.set('branchInfo', branch);
-				grunt.config.set('gitpush.remove.options.branch', ':'+makeBranchName(branch.type, branch.title));
+				grunt.config.set('gitpush.remove.options.branch', ':'+makeBranchName('review', branch.title, branch.type));
 				break;
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
