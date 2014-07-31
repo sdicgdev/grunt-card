@@ -11,6 +11,9 @@ var _ = require('underscore');
 
 module.exports = function(grunt, exec) {
 	require('load-grunt-tasks')(grunt);
+	grunt.loadNpmTasks('grunt-bump');
+	grunt.loadNpmTasks('grunt-git');
+	grunt.loadNpmTasks('grunt-prompt');
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
