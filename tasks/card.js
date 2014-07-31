@@ -177,6 +177,7 @@ module.exports = function(grunt, exec) {
 		, 'bump'
 		, 'gitpush:release'
 		, 'gitpush:remove'
+		, 'branch:remove'
 		]
 	);
 
@@ -245,6 +246,18 @@ module.exports = function(grunt, exec) {
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
 				grunt.config.set('branchInfo', branch);
 				grunt.config.set('gitpush.remove.options.branch', ':'+makeBranchName('review', branch.title, branch.type));
+				break;
+			case 'remove':
+				done = this.async();
+				grunt.util.spawn(
+					{ cmd: 'git'
+					, args: [ 'br', '-D', grunt.config('branchInfo')]
+				
+					}
+					, function(err, result, code){
+						done();
+					}
+				);
 				break;
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
