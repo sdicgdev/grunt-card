@@ -186,13 +186,14 @@ module.exports = function(grunt, exec) {
 		var done = this.async();
 		grunt.util.spawn(
 			{ cmd: 'git'
-			, args: [ 'branch']
+			, args: [ 'branch', '-r']
 			}
 			, function(err, result, code){
 				var  regx = new RegExp("^\\s*"+tag+"_")
 				   , endRay = [];
 				result = result.stdout.split("\n");
 				result.forEach(function(item, k, ray){
+					item = item.replace('origin/', '');
 					if(item.match(regx)){
 						endRay.push({name: item.trim()});
 					}
