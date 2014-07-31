@@ -116,6 +116,17 @@ module.exports = function(grunt, exec) {
 						}
 					]
 				}
+			}
+			, versionName: {
+				options: {
+					questions: [
+						{
+							config:   'bump.options.tagName',
+							type:     'input',
+							message:  "Name the release"
+						}
+					]
+				}
 			},
 		}
 		, bump: {
@@ -180,6 +191,18 @@ module.exports = function(grunt, exec) {
 		, 'branch:remove'
 		]
 	);
+
+	grunt.registerTask('sprint:complete', 'advance version and name completed sprint',
+		[ 'prompt:versionName'
+		, 'adjustVersion'
+		, 'bump:minor' 
+		]
+	)
+
+	grunt.registerTask('adjustVersion', function(){
+		var tag = grunt.config('bump.options.tagName');
+		grunt.config.set('bump.options.tagName', '%VERSION%-'+tag)
+	});
 
 	grunt.registerTask('card:find', 'find cards that are ready for review', function(tag){
 		grunt.config.set('gitcheckout.branch.options.create', false);
