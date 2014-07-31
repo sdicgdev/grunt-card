@@ -30,11 +30,13 @@ module.exports = function(grunt, exec) {
 					tags: true
 				}
 			},
+			remove:{
+			},
 			origin:{
 				options:{
 					upstream: true
 				}
-			}
+			},
 		},
 		gitcommit: {
 			describe: {
@@ -144,6 +146,7 @@ module.exports = function(grunt, exec) {
 
 	grunt.registerTask('card:submit', 'submit what you are working on for review',
 		[ 'branch:note'
+		, 'branch:removalPrep'
 		, 'gitcheckout:dev' // check out dev
 		, 'gitpull:dev' // pull dev
 		, 'branch:review' // merge in the random branch
@@ -151,6 +154,7 @@ module.exports = function(grunt, exec) {
 		, 'gitmerge:noted'
 		, 'gitpush:origin'
 		, 'gitcheckout:dev' // check out dev
+		, 'gitpush:remove'
 		]
 	);
 
@@ -165,6 +169,7 @@ module.exports = function(grunt, exec) {
 
 	grunt.registerTask('card:approve', 'send a branch back for more work',
 		[ 'branch:note'
+		, 'branch:removalPrep'
 		, 'branch:approve' 
 		, 'gitcommit:describe' // commit description to new branch
 		, 'gitcheckout:dev' // check out dev
@@ -172,6 +177,7 @@ module.exports = function(grunt, exec) {
 		, 'gitmerge:noted'
 		, 'bump'
 		, 'gitpush:release'
+		, 'gitpush:remove'
 		]
 	);
 
@@ -216,7 +222,7 @@ module.exports = function(grunt, exec) {
 		grunt.file.write('./etc/branch_description.json', JSON.stringify(branchDescription , null, "\t"))
 	});
 
-	grunt.registerTask('branch', 'create and merge random branches to and from dev', function(merge){
+	grunt.registerTask('branch', 'create and merge random branches to and from dev', function(merge, place){
 		var branch, name, done
 		switch(merge){
 			case 'approve':
@@ -235,6 +241,11 @@ module.exports = function(grunt, exec) {
 						done();
 					}
 				);
+				break;
+			case 'removalPrep':
+				branch = grunt.file.readJSON('./etc/branch_description.json');;
+				grunt.config.set('branchInfo', branch);
+				grunt.config.set('gitpush.remove.options.branch', ':'+makeBranchName(branch.type, branch.title));
 				break;
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
