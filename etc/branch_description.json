@@ -1,4 +1,4 @@
 {
-	"title": "removing dead branches",
-	"type": "feature"
+	"title": "merging in correct branch based on user action",
+	"type": "bug"
 }
