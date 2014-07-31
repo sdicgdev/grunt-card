@@ -246,6 +246,16 @@ module.exports = function(grunt, exec) {
 				grunt.config.set('branchInfo', branch);
 				grunt.config.set('gitpush.remove.options.branch', ':'+makeBranchName('review', branch.title, branch.type));
 				break;
+			case 'remove':
+				grunt.util.spawn(
+					{ cmd: 'git'
+					, args: [ 'br', '-D', makeBranchName(branch.type, branch.title), makeBranchName('review', branch.title, branch.type)]
+					}
+					, function(err, result, code){
+						done();
+					}
+				);
+				break;
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
 				if(place=="review"){
