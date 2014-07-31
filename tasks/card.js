@@ -168,7 +168,7 @@ module.exports = function(grunt, exec) {
 	);
 
 	grunt.registerTask('card:approve', 'send a branch back for more work',
-		[ 'branch:note'
+		[ 'branch:note:review'
 		, 'branch:removalPrep'
 		, 'branch:approve' 
 		, 'gitcommit:describe' // commit description to new branch
@@ -249,8 +249,13 @@ module.exports = function(grunt, exec) {
 				break;
 			case 'note':
 				branch = grunt.file.readJSON('./etc/branch_description.json');;
+				if(place=="review"){
+					name = makeBranchName('review', branch.title, branch.type);
+				}else{
+					name = makeBranchName(branch.type, branch.title);
+				}
 				grunt.config.set('branchInfo', branch);
-				grunt.config.set('gitmerge.noted.options.branch', makeBranchName(branch.type, branch.title));
+				grunt.config.set('gitmerge.noted.options.branch', name);
 				break;
 			case 'review':
 				branch = grunt.config('branchInfo');
